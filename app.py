@@ -19,6 +19,9 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
+# Create logs directory if it doesn't exist
+os.makedirs('logs', exist_ok=True)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -137,11 +140,13 @@ def server_error(error):
 
 
 if __name__ == '__main__':
-    # Create logs directory if it doesn't exist
+    # Create logs directory if it doesn't exist (moved to top)
     os.makedirs('logs', exist_ok=True)
+    os.makedirs('data', exist_ok=True)
     
     # Run Flask app
     port = int(os.getenv('FLASK_PORT', 5000))
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     
+    logger.info(f"Starting ISIS Metrics Dashboard on port {port}")
     app.run(host='0.0.0.0', port=port, debug=debug)
