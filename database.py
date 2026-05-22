@@ -111,6 +111,29 @@ def get_metrics_history(device: str, hours: int = 24) -> List[Dict]:
         return []
 
 
+def get_latest_metrics(device: str) -> Optional[Dict]:
+    """Get most recent metrics for a device"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT * FROM metrics 
+            WHERE device = ?
+            ORDER BY timestamp DESC
+            LIMIT 1
+        ''', (device,))
+        
+        row = cursor.fetchone()
+        conn.close()
+        
+        return dict(row) if row else None
+    except Exception as e:
+        logger.error(f"Error fetching latest metrics: {str(e)}")
+        return None
+
+
 def cleanup_old_data(days: int = 30):
     """Remove metrics older than specified days"""
     try:
